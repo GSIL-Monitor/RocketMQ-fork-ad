@@ -133,7 +133,11 @@ public class RouteInfoManager {
         try {
             try {
                 this.lock.writeLock().lockInterruptibly();
-
+                /*
+                    维护 RouteInfoManager.clusterAddrTable 变量； 若 Broker 集群名字不
+                    在该 Map 变量中，则初始化一个 Set 集合，将 brokerName 存入该 Set 集合中，
+                    然后以 clusterName 为 key 值，该 Set 集合为 values 值存入此 Map 变量中
+                */
 
                 Set<String> brokerNames = this.clusterAddrTable.get(clusterName);
                 if (null == brokerNames) {
@@ -144,7 +148,15 @@ public class RouteInfoManager {
 
                 boolean registerFirst = false;
 
-
+                /*
+                    维护 RouteInfoManager.brokerAddrTable 变量，该变量是维护 Broker
+                    的名称、 ID、地址等信息的。 若该 brokername 不在该 Map 变量中，则创建
+                    BrokerData 对象，该对象包含了 brokername，以及 brokerId 和 brokerAddr 为
+                    K-V 的 brokerAddrs 变量；然后以 brokername 为 key 值将 BrokerData 对象存入
+                    该 brokerAddrTable 变量中； 说明同一个 BrokerName 下面可以有多个不同
+                    BrokerId 的 Broker 存在，表示一个 BrokerName 有多个 Broker 存在，通过
+                    BrokerId 来区分主备
+                */
                 BrokerData brokerData = this.brokerAddrTable.get(brokerName);
                 if (null == brokerData) {
                     registerFirst = true;

@@ -385,7 +385,11 @@ public class MQClientInstance {
 
         return false;
     }
-
+    //1、初始化 HeartbeatData 对象，将该 Producer 或 Consumer 的 ClientID 赋值给 HeartbeatData 对象的 clientID 变量；
+    //2、遍历 MQClientInstance.consumerTable，根据每个 MQConsumerInner 对象的值初始化ConsumerData 对象和ProducerData对象
+    //3、若 ConsumerData 集合和 ProducerData 集合都为空，说明没有 consumer或 produer，则不发送心跳信息；
+    //4、若不是都为空，则遍历 MQClientInstance.brokerAddrTable 列表，向每个 Broker 地址发送请求码为 HEART_BEAT 的心跳消息，
+    // 但是当存在 Consumer 时才向所有 Broker 发送心跳消息，否则若不存在 Consumer 则只向主用 Broker 地址发送心跳消息；
     private void sendHeartbeatToAllBroker() {
         final HeartbeatData heartbeatData = this.prepareHeartbeatData();
         final boolean producerEmpty = heartbeatData.getProducerDataSet().isEmpty();
